@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/cloudinary/cloudinary-go/v2/api"
@@ -23,8 +24,22 @@ type API struct {
 	Client http.Client
 }
 
-// New creates a new Provisioning API instance from the environment variable (CLOUDINARY_URL).
+// New creates a new Provisioning API instance from environment variables.
+//
+// It checks CLOUDINARY_ACCOUNT_URL first. The expected format is:
+//
+//	account://<ACCOUNT_API_KEY>:<ACCOUNT_API_SECRET>@<ACCOUNT_ID>
+//
+// If CLOUDINARY_ACCOUNT_URL is not set, it falls back to CLOUDINARY_URL.
 func New() (*API, error) {
+	if accountURL := os.Getenv("CLOUDINARY_ACCOUNT_URL"); accountURL != "" {
+		c, err := config.NewFromAccountURL(accountURL)
+		if err != nil {
+			return nil, err
+		}
+		return NewWithConfiguration(c)
+	}
+
 	c, err := config.New()
 	if err != nil {
 		return nil, err

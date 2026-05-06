@@ -109,6 +109,34 @@ func TestConfiguration_AuthToken(t *testing.T) {
 	assert.EqualValues(t, 2, c.AuthToken.Duration)
 }
 
+func TestConfiguration_NewFromAccountURL(t *testing.T) {
+	// Valid URL
+	c, err := config.NewFromAccountURL("account://mykey:mysecret@my-account-id")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	assert.Equal(t, "mykey", c.Cloud.APIKey)
+	assert.Equal(t, "mysecret", c.Cloud.APISecret)
+	assert.Equal(t, "my-account-id", c.Cloud.AccountID)
+	assert.Equal(t, "", c.Cloud.CloudName)
+
+	// Empty URL
+	_, err = config.NewFromAccountURL("")
+	assert.EqualError(t, err, "must provide CLOUDINARY_ACCOUNT_URL")
+
+	// Wrong scheme
+	_, err = config.NewFromAccountURL("cloudinary://key:secret@cloud")
+	assert.EqualError(t, err, "cloudinary account URL must have scheme 'account', got 'cloudinary'")
+
+	// Query params are forwarded (e.g. upload_prefix override)
+	c, err = config.NewFromAccountURL("account://k:s@acct-id?upload_prefix=https://custom.api.com")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	assert.Equal(t, "acct-id", c.Cloud.AccountID)
+	assert.Equal(t, "https://custom.api.com", c.API.UploadPrefix)
+}
+
 func TestConfiguration_SignatureVersion(t *testing.T) {
 	c, err := config.NewFromURL(cldtest.CldURL + "?signature_version=1")
 	if err != nil {

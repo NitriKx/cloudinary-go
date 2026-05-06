@@ -11,6 +11,27 @@ import (
 
 var ctx = context.Background()
 
+// TestNew_AccountURL verifies that provisioning.New() picks up CLOUDINARY_ACCOUNT_URL.
+func TestNew_AccountURL(t *testing.T) {
+	t.Setenv("CLOUDINARY_ACCOUNT_URL", "account://mykey:mysecret@my-account-id")
+	// Unset CLOUDINARY_URL so we don't accidentally fall through to it.
+	t.Setenv("CLOUDINARY_URL", "")
+
+	a, err := provisioning.New()
+	if err != nil {
+		t.Fatalf("provisioning.New() error: %v", err)
+	}
+	if a.Config.Cloud.APIKey != "mykey" {
+		t.Errorf("expected APIKey 'mykey', got '%s'", a.Config.Cloud.APIKey)
+	}
+	if a.Config.Cloud.APISecret != "mysecret" {
+		t.Errorf("expected APISecret 'mysecret', got '%s'", a.Config.Cloud.APISecret)
+	}
+	if a.Config.Cloud.AccountID != "my-account-id" {
+		t.Errorf("expected AccountID 'my-account-id', got '%s'", a.Config.Cloud.AccountID)
+	}
+}
+
 // Live test credentials are read from environment variables.
 //
 // Required:
