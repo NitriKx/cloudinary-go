@@ -10,6 +10,7 @@ type Cloud struct {
 	APIKey             string `schema:"-"`
 	APISecret          string `schema:"-"`
 	OAuthToken         string `schema:"oauth_token"`
+	AccountID          string `schema:"account_id"`
 	SignatureAlgorithm string `schema:"signature_algorithm"`
 	SignatureVersion   int    `schema:"signature_version" default:"2"`
 }

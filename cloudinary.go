@@ -3,6 +3,7 @@ package cloudinary
 import (
 	"github.com/cloudinary/cloudinary-go/v2/api/admin"
 	"github.com/cloudinary/cloudinary-go/v2/api/admin/search"
+	"github.com/cloudinary/cloudinary-go/v2/api/provisioning"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/cloudinary/cloudinary-go/v2/asset"
 	"github.com/cloudinary/cloudinary-go/v2/config"
@@ -11,10 +12,11 @@ import (
 
 // Cloudinary main struct
 type Cloudinary struct {
-	Config config.Configuration
-	Admin  admin.API
-	Upload uploader.API
-	Logger *logger.Logger
+	Config       config.Configuration
+	Admin        admin.API
+	Upload       uploader.API
+	Provisioning provisioning.API
+	Logger       *logger.Logger
 }
 
 // New returns a new Cloudinary instance from environment variable.
@@ -65,6 +67,10 @@ func NewFromConfiguration(configuration config.Configuration) (*Cloudinary, erro
 			Logger: log,
 		},
 		Upload: uploader.API{
+			Config: configuration,
+			Logger: log,
+		},
+		Provisioning: provisioning.API{
 			Config: configuration,
 			Logger: log,
 		},
